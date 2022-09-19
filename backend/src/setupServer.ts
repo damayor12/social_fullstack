@@ -7,13 +7,13 @@ import compression from 'compression';
 import cookieSession from 'cookie-session';
 import HTTP_STATUS from 'http-status-codes';
 import { Server } from 'socket.io';
-import { config } from './config';
+import { config } from '@root/config';
 import { createClient } from 'redis';
 import { createAdapter } from '@socket.io/redis-adapter';
 import 'colors';
 import 'express-async-errors';
-import routes from './routes';
-import { CustomError, IErrorResponse } from './shared/globals/helpers/error-handler';
+import routes from '@root/routes';
+import { CustomError, IErrorResponse } from '@global/helpers/error-handler';
 import Logger from 'bunyan';
 
 const SERVER_PORT = 5000;
@@ -73,7 +73,8 @@ export class ChattyServer {
     });
 
     app.use((error: IErrorResponse, req: Request, res: Response, next: NextFunction) => {
-      log.error(error.message.red.inverse);
+      log.error('the error', error.message);
+      // console.log(error.message.red.inverse);
 
       if (error instanceof CustomError) {
         return res.status(error.statusCode).json(error.serializeErrors());
@@ -88,7 +89,7 @@ export class ChattyServer {
       const socketIO: Server = await this.createSocketIO(httpServer);
       this.startHttpServer(httpServer);
       this.socketIOconnections(socketIO);
-    } catch (error) {
+    } catch (error: any) {
       log.error(error);
     }
   }
@@ -115,5 +116,7 @@ export class ChattyServer {
     });
   }
 
-  private socketIOconnections(io: Server): void {}
+  private socketIOconnections(io: Server): void {
+    log.info('socketIoConnection');
+  }
 }
