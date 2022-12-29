@@ -16,10 +16,10 @@ class Config {
   public CLOUD_API_SECRET: string | undefined;
 
   private readonly DEFAULT_DATABASE_URL =
-    'mongodb+srv://social:social@cluster0.k2ealyf.mongodb.net/?retryWrites=true&w=majority';
+  'mongodb+srv://social:social@cluster0.qdu08.mongodb.net/?retryWrites=true&w=majority';
 
   constructor() {
-   
+    
     this.DATABASE_URL = process.env.DATABASE_URL || this.DEFAULT_DATABASE_URL;
     this.JWT_TOKEN = process.env.JWT_TOKEN || '1234';
     this.NODE_ENV = process.env.NODE_ENV || '';
@@ -45,7 +45,6 @@ class Config {
   }
 
   public cloudinaryConfig(): void {
-    console.log('config', this.cloudinaryConfig);
     cloudinary.v2.config({
       cloud_name: this.CLOUD_NAME,
       api_key: this.CLOUD_API_KEY,
@@ -54,6 +53,5 @@ class Config {
   }
 }
 
- console.log('enddv', process.env.DATABASE_URL);
 
 export const config: Config = new Config();

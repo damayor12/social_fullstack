@@ -12,8 +12,10 @@ import HTTP_STATUS from 'http-status-codes';
 import { IUserDocument } from '@root/features/user/interfaces/user.interface';
 import { config } from '@root/config';
 import { UserCache } from '@service/redis/user.cache';
-
-
+import { omit } from 'lodash';
+import { authQueue } from '@service/queues/auth.queue';
+import { userQueue } from '@service/queues/user.queue';
+import JWT from 'jsonwebtoken';
 
 const userCache: UserCache = new UserCache();
 
@@ -57,11 +59,35 @@ export class Signup {
     const userDataForCache: IUserDocument = Signup.prototype.userData(authData, userObjectId);
     userDataForCache.profilePicture = `https://res.cloudinary.com/${config.CLOUD_NAME}/image/upload/v${result.version}/${userObjectId}`;
 
-    // Save to Redis
-    await userCache.saveUserCache(`${userObjectId}`, uId, userDataForCache)
+    // Cache and Save to Redis
+    await userCache.saveUserCache(`${userObjectId}`, uId, userDataForCache);
+
+    // Prepare data for MongoDB and add to Queue
+    omit(userDataForCache, ['uId', 'username', 'email', 'avatarColor', 'password']);
+
+    // Add prepared data to Queue
+    authQueue.addAuthUserJob('addAuthUserToDB', { value: authData });
+    userQueue.addUserJob('addUserToDB', { value: userDataForCache });
+
+    const userJwt: string = Signup.prototype.signToken(authData, userObjectId);
+    req.session = { jwt: userJwt };
 
     // Send response back
-    res.status(HTTP_STATUS.CREATED).json({ message: 'created successfully', authData });
+    res
+      .status(HTTP_STATUS.CREATED)
+      .json({ message: 'created successfully', user: userDataForCache, token: userJwt });
+  }
+
+  private signToken(data: IAuthDocument, userObjectId: ObjectId): string {
+    return JWT.sign(
+      {
+        userId: userObjectId,
+        email: data.email,
+        username: data.username,
+        avatarColor: data.avatarColor,
+      },
+      config.JWT_TOKEN!,
+    );
   }
 
   private signupData(data: ISignUpData): IAuthDocument {

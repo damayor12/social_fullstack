@@ -43,5 +43,5 @@ export interface ISignUpData {
 }
 
 export interface IAuthJob {
-  value?: string | IAuthDocument 
+  value?: string | IAuthDocument | Document
 }

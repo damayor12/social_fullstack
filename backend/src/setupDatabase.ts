@@ -8,6 +8,7 @@ const log: Logger = config.createLogger('setupDatabase');
 
 export default () => {
   const connect = () => {
+    console.log('YESSSSSSS        =>',config.DATABASE_URL);
     mongoose
       .connect(config.DATABASE_URL!)
       .then(() => {
