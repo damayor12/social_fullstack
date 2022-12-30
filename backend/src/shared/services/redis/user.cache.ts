@@ -12,7 +12,7 @@ export class UserCache extends BaseCache {
     super('userCache');
   }
 
-  public async saveUserCache(
+  public async saveUserToCache(
     key: string,
     userUId: string,
     createdUser: IUserDocument,

@@ -21,14 +21,13 @@ const userCache: UserCache = new UserCache();
 
 export class Signup {
   @joiValidation(signupSchema)
-  public async create(req: Request, res: Response, next: NextFunction): Promise<void> {
+  public async create(req: Request, res: Response, next?: NextFunction): Promise<void> {
     const { username, email, password, avatarColor, avatarImage } = req.body;
 
     const checkIfUserExists: IAuthDocument = await authService.getUserByUserNameOrEmail(
       username,
       email,
     );
-    console.log('exists', checkIfUserExists);
     if (checkIfUserExists) {
       throw new BadRequestError('Invalid credentials');
     }
@@ -60,7 +59,7 @@ export class Signup {
     userDataForCache.profilePicture = `https://res.cloudinary.com/${config.CLOUD_NAME}/image/upload/v${result.version}/${userObjectId}`;
 
     // Cache and Save to Redis
-    await userCache.saveUserCache(`${userObjectId}`, uId, userDataForCache);
+    await userCache.saveUserToCache(`${userObjectId}`, uId, userDataForCache);
 
     // Prepare data for MongoDB and add to Queue
     omit(userDataForCache, ['uId', 'username', 'email', 'avatarColor', 'password']);
@@ -75,7 +74,7 @@ export class Signup {
     // Send response back
     res
       .status(HTTP_STATUS.CREATED)
-      .json({ message: 'created successfully', user: userDataForCache, token: userJwt });
+      .json({ message: 'user created successfully', user: userDataForCache, token: userJwt });
   }
 
   private signToken(data: IAuthDocument, userObjectId: ObjectId): string {

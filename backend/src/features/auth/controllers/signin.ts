@@ -42,7 +42,6 @@ export class SignIn {
 
     req.session = { jwt: userJwt };
 
-    console.log('seeeeeession', req.session)
 
     const userDocument = {
       ...user,
