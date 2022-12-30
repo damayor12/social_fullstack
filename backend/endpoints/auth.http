@@ -24,7 +24,7 @@ withCredentials: true
 
 {
   "username": "hbjd",
-  "password": "rgerg"
+  "password": "querty12"
 }
 
 ###
@@ -38,3 +38,27 @@ GET {{baseUrl}}/{{urlPath}}/currentuser
 Content-Type: application/json
 Accept: application/json
 withCredentials: true
+
+
+###
+POST {{baseUrl}}/{{urlPath}}/forgot-password
+Content-Type: application/json
+Accept: application/json
+withCredentials: true
+
+{
+  "email": "rgerg@rgeg.com"
+}
+
+
+
+###
+POST {{baseUrl}}/{{urlPath}}/reset-password/1bce3d67362ac984fbac736720bfb83c84d92e55
+Content-Type: application/json
+Accept: application/json
+withCredentials: true
+
+{
+  "password": "querty12",
+  "confirmPassword": "querty12"
+}

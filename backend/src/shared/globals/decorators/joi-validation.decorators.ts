@@ -18,14 +18,8 @@ export function joiValidation(schema: ObjectSchema): IJoiDecorator {
     descriptor.value = async function (...args: any[]) {
       const req: Request = args[0];
       const { error } = await Promise.resolve(schema.validate(req.body));
-      const nextFn = args[2];
-      try {
-        if (error?.details) {
-          throw new JoiRequestValidationError(error.details[0].message);
-        }
-      } catch (error) {
-        return nextFn(error);
-      }
+
+      if (error?.details) throw new JoiRequestValidationError(error.details[0].message);
 
       return passedFunction.apply(this, args);
     };
